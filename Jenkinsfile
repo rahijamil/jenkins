@@ -1,15 +1,24 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = "f**ing shit!"
-    }
-    
     stages {
-        stage("Hello"){
+        stage('Build') {
             steps {
-                echo "Hello Pipeline from GitHub ${IMAGE_NAME}"
+                echo 'Building...'
             }
+        }
+    }
+
+    post {
+        success {
+            emailext subject: 'Build SUCCESS: ${JOB_NAME}',
+                     body: 'Job ${JOB_NAME} build #${BUILD_NUMBER} was successful.',
+                     to: 'cs.mohammadrahi@gmail.com'
+        }
+        failure {
+            emailext subject: 'Build FAILURE: ${JOB_NAME}',
+                     body: 'Job ${JOB_NAME} build #${BUILD_NUMBER} failed.',
+                     to: 'cs.mohammadrahi@gmail.com'
         }
     }
 }
