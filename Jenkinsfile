@@ -11,14 +11,10 @@ pipeline {
 
     post {
         success {
-            emailext subject: 'Build SUCCESS: ${JOB_NAME}',
-                     body: 'Job ${JOB_NAME} build #${BUILD_NUMBER} was successful.',
-                     to: 'cs.mohammadrahi@gmail.com'
+            slackSend(channel: 'C0A800528JH', message: "✅ Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
         }
         failure {
-            emailext subject: 'Build FAILURE: ${JOB_NAME}',
-                     body: 'Job ${JOB_NAME} build #${BUILD_NUMBER} failed.',
-                     to: 'cs.mohammadrahi@gmail.com'
+            slackSend(channel: 'C0A800528JH', message: "❌ Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
         }
     }
 }
