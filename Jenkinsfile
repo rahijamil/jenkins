@@ -1,20 +1,40 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Build') {
-            steps {
-                echo 'Building...'
-            }
-        }
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-user-pass')
+        IMAGE_NAME = "rahijamil/jenkins-my-web"
     }
 
-    post {
-        success {
-            slackSend(channel: 'C0A800528JH', message: "✅ Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+    stages {
+        stage('Clone Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/rahijamil/jenkins.git'
+            }
         }
-        failure {
-            slackSend(channel: 'C0A800528JH', message: "❌ Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh 'docker build -t $IMAGE_NAME:latest .'
+                }
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                script {
+                    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                    sh 'docker push $IMAGE_NAME:latest'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying container...'
+                // You can add Kubernetes or Docker run command here
+            }
         }
     }
 }
