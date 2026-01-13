@@ -7,10 +7,15 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Docker Check') {
+            steps {
+                sh 'docker version'
             }
         }
 
@@ -35,7 +40,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Deploying ${IMAGE_NAME}:latest"
-                // docker run / k8s / helm later
+                // You can add docker run / Kubernetes / Helm commands here
             }
         }
     }
