@@ -2,21 +2,22 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-user-pass')
         IMAGE_NAME = "rahijamil/jenkins-my-web"
+        DOCKERHUB_CREDS = credentials('dockerhub-user-pass')
     }
 
     stages {
-        stage('Clone Code') {
+
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/rahijamil/jenkins.git'
+                checkout scm
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t $IMAGE_NAME:latest .'
+                    dockerImage = docker.build("${IMAGE_NAME}:latest")
                 }
             }
         }
@@ -24,17 +25,30 @@ pipeline {
         stage('Push to DockerHub') {
             steps {
                 script {
-                    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                    sh 'docker push $IMAGE_NAME:latest'
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-user-pass') {
+                        dockerImage.push('latest')
+                    }
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying container...'
-                // You can add Kubernetes or Docker run command here
+                echo "Deploying ${IMAGE_NAME}:latest"
+                // docker run / k8s / helm later
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished"
+        }
+        success {
+            echo "Build & Push successful 🎉"
+        }
+        failure {
+            echo "Pipeline failed ❌"
         }
     }
 }
