@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/rahijamil/jenkins.git'
             }
         }
 
@@ -40,7 +40,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Deploying ${IMAGE_NAME}:latest"
-                // You can add docker run / Kubernetes / Helm commands here
+                // docker run / Kubernetes / Helm commands
             }
         }
     }
