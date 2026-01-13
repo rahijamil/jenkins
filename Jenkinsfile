@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        docker 'docker-latest' 
+    }
+
     environment {
         IMAGE_NAME = "rahijamil/jenkins-my-web"
         DOCKERHUB_CREDS = credentials('dockerhub-user-pass')
